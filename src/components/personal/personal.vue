@@ -40,7 +40,7 @@
               </div>
             </div>
             <div class="chat">
-              <cube-button class="small">加入聊天</cube-button>
+              <cube-button class="small">加入聊天111</cube-button>
             </div>
           </div>
         </cube-scroll>
