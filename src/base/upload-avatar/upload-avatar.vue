@@ -1,17 +1,27 @@
 <template>
-  <div ref="photos">
+  <div class="child-wrap">
     <cube-upload
       ref="upload"
       v-model="imgurl"
       :action="action"
-      :max="9"
-      :simultaneous-uploads="9"
+      :max="1"
+      :multiple="multiple"
+      :simultaneous-uploads="1"
       :process-file="processFile"
       @file-submitted="fileSubmitted"
       @files-added="filesAdded"
       @file-success="filesSuccess"
       @file-error="fileError"
-      @file-removed="fileREmoved"/>
+      @file-removed="fileREmoved">
+      <div class="clear-fix">
+        <cube-upload-file v-for="(file, i) in imgurl" :file="file" :key="i"></cube-upload-file>
+        <cube-upload-btn :multiple="false">
+          <div>
+            <img :src="defaultAvatar"/>
+          </div>
+        </cube-upload-btn>
+      </div>
+    </cube-upload>
   </div>
 </template>
 
@@ -20,9 +30,15 @@
   import api from 'common/js/api'
   import compress from '../../modules/image'
 
+  const defaultAvatar = require('common/image/avatar.png')
+
   export default {
     props: {
-      getImgUrl: {
+      multiple: {
+        type: Boolean,
+        default: false
+      },
+      getimgurl: {
         type: Array,
         default: () => {
           return []
@@ -40,46 +56,33 @@
             fileName: ''
           }
         },
-        fileGroup: [],
-        initialIndex: 0
+        defaultAvatar
       }
     },
     created() {
-      if (this.getImgUrl.length) {
-        this.imgurl = this.getImgUrl
+      if (this.getimgurl.length) {
+        this.imgurl = this.getimgurl
         let arr = []
         this.imgurl.forEach(item => {
           arr.push(item.url)
         })
         this.imgurls = arr
-        this.$nextTick(() => {
-          this.previewImg()
-        })
-      } else {
-        this.imgurls = []
       }
       this.uploadFlag = false
       this.fileGroup = []
     },
     methods: {
       processFile(file, next) {
-        let quality = file.size < 1000 * 1024 ? 0.8 : 0.6
-        // 100kb内图片不压缩
-        if (file.size < 100 * 1024) {
-          compress(file, {
-            compress: false
-          }, next)
-        } else {
-          compress(file, {
-            compress: {
-              width: 1600,
-              height: 1600,
-              quality
-            }
-          }, next)
-        }
+        compress(file, {
+          compress: {
+            width: 1600,
+            height: 1600,
+            quality: 0.5
+          }
+        }, next)
       },
       fileSubmitted(file) {
+        console.log('fileSubmitted', file)
         let base64Value = file.file.base64.split(';base64,')[1]
         file.base64Value = base64Value
         this.action.data.fileName = file.name
@@ -105,6 +108,8 @@
           time: 1000,
           txt: '上传图片大小不能超过 6M!'
         }).show()
+        const file = this.imgurl[0]
+        file && this.$refs.upload.removeFile(file)
       },
       filesSuccess() {
         let arr = []
@@ -113,27 +118,15 @@
             arr.push(item.response.data)
           }
         })
-        let imgurls = this.imgurls.concat(arr)
-        this.imgurls = Array.from(new Set(imgurls))
+        this.imgurls = arr
         this.$emit('uploadimg', this.imgurls)
         this.previewImg()
       },
-      eventHandle(index) {
-        this.initialIndex = index
-        const params = {
-          $props: {
-            imgs: this.imgurls,
-            initialIndex: 'initialIndex', // 响应式数据的key名
-            loop: false
-          },
-          $events: {
-            change: (i) => {
-              // 必须更新 initialIndex
-              this.initialIndex = i
-            }
-          }
-        }
-        this.$createImagePreview({...params}).show()
+      eventHandle() {
+        this.$createImagePreview({
+          imgs: this.imgurls,
+          initialIndex: 0
+        }).show()
       },
       fileError(file) {
         console.log(file)
@@ -147,26 +140,22 @@
               this.$emit('deleteimg', this.imgurls)
             }
           })
-        } else {
-          if (this.imgurls.length) {
-            this.imgurls.forEach((item, index) => {
-              if (item === file.url) {
-                this.imgurls.splice(index, 1)
-                this.$emit('deleteimg', this.imgurls)
-              }
-            })
-          }
+        } else if (file.url) { // 已有头像传入修改
+          let url = file.url
+          this.imgurls.forEach((item, index) => {
+            if (item === url) {
+              this.imgurls.splice(index, 1)
+              this.$emit('deleteimg', this.imgurls)
+            }
+          })
         }
       },
       previewImg() {
         if (!this.uploadFlag) {
           this.uploadFlag = true
-          this.fileGroup = this.$refs.photos.querySelectorAll('.cube-upload-file-state')
-          this.fileGroup = [].slice.call(this.fileGroup)
-          this.fileGroup.forEach((item, index) => {
-            item.addEventListener('click', () => {
-              this.eventHandle(index)
-            }, false)
+          this.fileGroup = document.querySelectorAll('.cube-upload-file-state')
+          this.fileGroup.forEach((item) => {
+            item.addEventListener('click', this.eventHandle, false)
           })
         }
       }
@@ -175,5 +164,37 @@
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
+  @import "~stylus/mixin"
 
+  $width = 100px
+  $top = -100px
+  .cube-upload
+    .cube-upload-file, .cube-upload-btn
+      margin: 0 auto
+      width: $width
+      height: $width
+    .cube-upload-file
+      margin: 0 auto
+      border-radius: 50%
+      /*.cube-upload-file-state*/
+      + .cube-upload-btn
+        margin-top: $top
+        opacity: 0
+    /deep/ .cube-upload-file-def
+      width: 100%
+      height: 100%
+      border-radius: 50%
+      .cubeic-wrong
+        display: none
+    .cube-upload-btn
+      display: flex
+      align-items: center
+      justify-content: center
+      > div
+        height: 40px
+        position: relative
+      img
+        width: 40px
+        height: 40px
+        border-radius: 50%
 </style>

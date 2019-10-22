@@ -22,7 +22,7 @@ const router = new Router({
       component: Error
     },
     {
-      path: '/personal',
+      path: '/personal/:roomId/:createId',
       component: Personal,
       meta: {
         title: '个人信息'

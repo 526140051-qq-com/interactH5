@@ -6,12 +6,12 @@
         <div
           v-for="(item, index) in list"
           :key="item.id"
-          @click="handler"
+          @click="handler(item.id)"
           class="box">
           <div class="box-l">
             <div class="icon" :class="`icon${index + 1}`"></div>
-            <div class="title">{{item.title}}</div>
-            <div class="time">{{item.time}}</div>
+            <div class="title">{{item.name}}</div>
+            <div class="time">{{item.days}}</div>
           </div>
           <div class="box-r">
             <div class="price">¥{{item.price}}</div>
@@ -25,48 +25,48 @@
 
 <script type="text/ecmascript-6">
   import Loading from 'base/loading/loading'
+  import api from 'common/js/api'
+  import {ERR_OK} from 'common/js/config'
+  import {UA} from 'common/js/regexp'
 
   export default {
     data() {
       return {
         isLoading: true,
-        list: [
-          {
-            id: 1,
-            title: '日票',
-            time: '24小时有效',
-            price: '9.9'
-          },
-          {
-            id: 2,
-            title: '周票',
-            time: '7天有效',
-            price: '59.9'
-          },
-          {
-            id: 3,
-            title: '月票',
-            time: '30天有效',
-            price: '199'
-          },
-          {
-            id: 4,
-            title: '年票',
-            time: '1年有效',
-            price: '1999'
-          }
-        ]
+        list: []
       }
     },
     created() {
       this.fetchData()
     },
     methods: {
-      fetchData() {
+      async fetchData() {
+        const list = await this.getData()
+        list.forEach(v => {
+          if (v.days === 1) {
+            v.days = '24小时有效'
+          } else if (v.days === 365) {
+            v.days = '1年有效'
+          } else {
+            v.days = v.days + '天有效'
+          }
+        })
+        this.list = list
         this.isLoading = false
       },
-      handler() {
-
+      getData() {
+        return new Promise(resolve => {
+          this.$post(api.findCharge, {state: 1}).then(res => {
+            if (res.code === ERR_OK) {
+              resolve(res.data)
+            }
+          })
+        })
+      },
+      handler(id) {
+        if (!UA().isAndroid) {
+          console.log(id)
+        }
       }
     },
     components: {

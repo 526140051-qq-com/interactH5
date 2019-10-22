@@ -66,5 +66,5 @@
           color: #ec494c
     .time
       color: $gray
-      margin: 10px 0 0
+      margin: 12px 0 0
 </style>

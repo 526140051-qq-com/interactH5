@@ -50,44 +50,42 @@ em, i
 
 .single
   display: flex
-  padding: 0 15px
   justify-content: space-between
   align-items: center
   font-size: 16px
   background: #fff
-  height: 60px
+  height: 50px
   label
-    margin-right: 15px
-    font-weight: 400
-  .cubeic-arrow
-    position: relative
-    right: -2px
+    width: 72px
+    flex: 0 0 72px
+    color: #999
   .single-static
-    color: $static
+    color: $dark
     flex: 1
     ofh()
-    padding-left: 20px
-    text-align: right
   .avatar
     width: 40px
     height: 40px
   .single-control
     flex: 1
     color: $static
-    input
-      width: 100%
-      text-align: right
-      color: $dark
-      height: 30px
-      outline-color: #95CA6C
+    .cube-input
+      font-size: 16px
+      .cube-input-field
+        padding: 0
+        width: 100%
+        color: $dark
+        height: 30px
     span
       margin-right: 2px
   .single-select
-    color: $static
-    span
-      margin-right: 2px
-      &.bold
-        color: $dark
+    flex: 1
+    color: $dark
+    display: flex
+    justify-content: space-between
+    .cubeic-arrow
+      position: relative
+      right: 8px
 
 .cc-list
   font-size: 16px
