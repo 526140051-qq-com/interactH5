@@ -10,7 +10,7 @@
           <div>
             <!--<img v-if="user.photo" @load="imgLoaded" class="banner" :src="user.photo" alt="">-->
             <div class="avatar">
-              <img v-if="user.photo" @click="handleAvatarClick" :src="user.photo" alt="">
+              <img v-if="user.photo" @load="imgLoaded" @click="handleAvatarClick" :src="user.photo" alt="">
               <img v-else :src="defaultAvatar" alt="">
             </div>
             <div class="personal">
@@ -48,7 +48,7 @@
               </div>
             </div>
             <div class="chat">
-              <cube-button @click="joinChat">加入聊天</cube-button>
+              <cube-button @click="joinRoom">加入聊天</cube-button>
             </div>
           </div>
         </cube-scroll>
@@ -105,7 +105,12 @@
         })
       },
       imgLoaded() {
-        this.$refs.scroll.refresh()
+        if (!this.checkloaded) {
+          this.checkloaded = true
+          setTimeout(() => {
+            this.$refs.scroll.refresh()
+          }, 20)
+        }
       },
       handleAvatarClick() {
         this.$createImagePreview({
@@ -133,9 +138,12 @@
         return getAge(idCard)
       },
       // 加入聊天
-      joinChat() {
-        if (UA().isAndroid) {
-          this.$toast(`房间ID=${this.roomId}`)
+      joinRoom() {
+        if (UA().isIOS) { // ios
+          /* eslint-disable no-undef */
+          OCModel.joinRoom(this.roomId)
+        } else { // android
+          window.android.joinRoom(this.roomId)
         }
       }
     },

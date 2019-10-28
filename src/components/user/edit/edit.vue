@@ -3,7 +3,9 @@
     <loading v-if="isLoading"></loading>
     <template v-else>
       <div class="scroll-list-wrap">
-        <cube-scroll>
+        <cube-scroll
+          ref="scroll"
+          :data="imgUrls">
           <div>
             <div class="avatar">
               <upload-avatar
