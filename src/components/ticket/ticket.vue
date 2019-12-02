@@ -6,7 +6,7 @@
         <div
           v-for="(item, index) in list"
           :key="item.id"
-          @click="handler(item.id)"
+          @click="handlePay(item.id)"
           class="box">
           <div class="box-l">
             <div class="icon" :class="`icon${index + 1}`"></div>
@@ -63,10 +63,23 @@
           })
         })
       },
-      handler(id) {
-        if (!UA().isAndroid) {
-          console.log(id)
+      handlePay(chargeId) {
+        if (UA().isIOS) {
+          this.doPay(chargeId)
+        } else {
+          this.doPay(chargeId).then(res => {
+            window.android.callWxPay(res)
+          })
         }
+      },
+      doPay(chargeId) {
+        return new Promise(resolve => {
+          this.$post(api.wxPayApi, {chargeId}).then(res => {
+            if (res.code === ERR_OK) {
+              resolve(res.data)
+            }
+          })
+        })
       }
     },
     components: {

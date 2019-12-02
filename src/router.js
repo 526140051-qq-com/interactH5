@@ -4,6 +4,7 @@ import Router from 'vue-router'
 const Error = () => import('components/error/error')
 const Personal = () => import('components/personal/personal')
 const Ticket = () => import('components/ticket/ticket')
+const Advert = () => import('components/advert/advert')
 const Payment = () => import('components/payment/payment')
 const SendGift = () => import('components/user/gift/send-gift')
 const ReceiveGift = () => import('components/user/gift/receive-gift')
@@ -12,6 +13,7 @@ const RechargeRecord = () => import('components/user/recharge/recharge-record')
 const Withdraw = () => import('components/user/withdraw/withdraw')
 const WithdrawRecord = () => import('components/user/withdraw/withdraw-record')
 const UserEdit = () => import('components/user/edit/edit')
+const Disclaimer = () => import('components/disclaimer/disclaimer')
 
 Vue.use(Router)
 
@@ -33,6 +35,13 @@ const router = new Router({
       component: Ticket,
       meta: {
         title: '相亲交友'
+      }
+    },
+    {
+      path: '/advert/:id',
+      component: Advert,
+      meta: {
+        title: '详情'
       }
     },
     {
@@ -89,6 +98,13 @@ const router = new Router({
       component: UserEdit,
       meta: {
         title: '编辑'
+      }
+    },
+    {
+      path: '/disclaimer',
+      component: Disclaimer,
+      meta: {
+        title: '免责申明'
       }
     }
   ]

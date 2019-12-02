@@ -40,7 +40,9 @@
               </div>
               <div class="single border-bottom-1px">
                 <label>身份证</label>
-                <div class="single-static">{{user.identityCard}}</div>
+                <div class="single-control">
+                  <cube-input v-model.trim="user.identityCard" placeholder="请输入身份证" clearable></cube-input>
+                </div>
               </div>
               <div class="border-bottom-1px">
                 <city-picker
@@ -173,6 +175,7 @@
         this.user.photos = imgUrls.join(',')
       },
       formatAge(idCard) {
+        if (!idCard) return ''
         return getAge(idCard)
       },
       selectSexHandler(val, text) {
@@ -202,14 +205,16 @@
       },
       updateUserInfo() {
         return new Promise(resolve => {
+          const {photo, nickName, gender, identityCard, city, interest, photos} = this.user
           this.$post(api.updateUserInfo, {
-            photo: this.user.photo,
-            nickName: this.user.nickName,
-            gender: this.user.gender,
-            city: this.user.city,
+            photo,
+            nickName,
+            gender,
+            idCard: identityCard,
+            city,
             cityIndex: this.selectedCityIndex.join(','),
-            interest: this.user.interest,
-            photos: this.user.photos
+            interest,
+            photos
           }).then(res => {
             if (res.code === ERR_OK) {
               resolve()

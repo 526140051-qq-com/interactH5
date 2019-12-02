@@ -78,7 +78,7 @@
     },
     created() {
       const {roomId, createId} = this.$route.params
-      this.roomId = roomId
+      this.roomId = parseInt(roomId)
       this.createId = createId
       this.fetchData()
     },
@@ -92,6 +92,7 @@
         }
         this.user = user
         this.isLoading = false
+        this.imgLoaded()
       },
       getData() {
         return new Promise(resolve => {
@@ -105,12 +106,9 @@
         })
       },
       imgLoaded() {
-        if (!this.checkloaded) {
-          this.checkloaded = true
-          setTimeout(() => {
-            this.$refs.scroll.refresh()
-          }, 20)
-        }
+        setTimeout(() => {
+          this.$refs.scroll.refresh()
+        }, 20)
       },
       handleAvatarClick() {
         this.$createImagePreview({
@@ -135,6 +133,7 @@
         this.$createImagePreview({...params}).show()
       },
       formatAge(idCard) {
+        if (!idCard) return ''
         return getAge(idCard)
       },
       // 加入聊天

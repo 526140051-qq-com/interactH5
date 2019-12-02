@@ -8,6 +8,7 @@ let formatDate = (value, fmt) => {
     return moment(value).format('YYYY-MM-DD')
   }
 }
+
 export {
   formatDate
 }

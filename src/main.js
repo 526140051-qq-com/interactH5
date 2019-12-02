@@ -7,7 +7,7 @@ import 'common/stylus/index.styl'
 import {post} from 'common/js/util'
 import FastClick from 'fastclick'
 import {saveUserId} from 'common/js/cache'
-import * as custom from './common/js/filter'
+import * as custom from 'common/js/filter'
 /* eslint-disable no-unused-vars */
 // import vConsole from 'vconsole'
 
