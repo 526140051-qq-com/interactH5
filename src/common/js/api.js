@@ -4,7 +4,10 @@ export default {
   updateUserInfo: '/user/updateUserInfo', // 编辑用户信息
   findCharge: '/user/findCharge', // 查询会员收费标准
   getPayLogPager: '/user/getPayLogPager', // 充值记录
+  addWithdraw: '/withdraw/addWithdraw', // 手动提现
+  findWithdraw: '/withdraw/findWithdraw', // 提现记录
   wxWithdrawalPager: '/user/wxWithdrawalPager', // 微信会员提现记录
   wxPayApi: '/user/wxPayApi', // 微信统一下单请求
-  selectAdverById: '/adminManager/selectAdverById' // 根据广告ID查询详情
+  selectAdverById: '/adminManager/selectAdverById', // 根据广告ID查询详情
+  selectByKey: '/user/selectByKey' // 平台设置查询
 }

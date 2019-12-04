@@ -12,12 +12,12 @@
             <ul v-if="list.length">
               <li v-for="item in list" :key="item.id" class="list border-bottom-1px">
                 <div class="top">
-                  <div class="order">订单号：{{item.num}}</div>
+                  <div class="order">订单号：19200000</div>
                   <div class="money">-&yen;{{item.money.toFixed(2)}}</div>
                 </div>
                 <div class="bottom">
                   <div>{{item.createTime | formatDate('s')}}</div>
-                  <div>{{item.state === 1 ? '待付款' : '已付款'}}</div>
+                  <div>已付款</div>
                 </div>
               </li>
             </ul>
@@ -80,7 +80,7 @@
       },
       getData() {
         return new Promise(resolve => {
-          this.$post(api.findWithdraw, {
+          this.$post(api.wxWithdrawalPager, {
             pageNum: this.pageNum,
             pageSize: this.pageSize
           }).then(res => {
@@ -123,18 +123,12 @@
       padding: 18px 15px
       .top
         display: flex
+        justify-content: space-between
         align-items: center
         font-size: 16px
         .order
-          flex: 1
           color: $dark
-          white-space: nowrap
-          overflow: hidden
-          text-overflow: ellipsis
         .money
-          width: 100px
-          flex: 0 0 100px
-          text-align: right
           color: $red
       .bottom
         margin-top: 12px

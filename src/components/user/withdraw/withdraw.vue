@@ -3,11 +3,15 @@
     <loading v-if="isLoading"></loading>
     <template v-else>
       <div class="wrapper">
-        <div class="amount">
-          <div class="lbl">金额</div>
-          <cube-input v-model.trim="amount" :placeholder="placeholder" clearable></cube-input>
+        <div class="title">
+          <div class="lbl">提现金额</div>
+          <div @click="getAllMoney" class="all">全部提现</div>
         </div>
-        <div class="payment">
+        <div class="amount">
+          <div class="lbl">¥</div>
+          <cube-input v-model.number="amount" placeholder="请输入提现金额" clearable></cube-input>
+        </div>
+        <div v-if="false" class="payment">
           <div @click="payHandler(1)" :class="{'active': type === 1}" class="pay wechat border-bottom-1px">
             <div class="pay-l">
               <i></i>
@@ -23,8 +27,9 @@
             <div class="pay-r"></div>
           </div>
         </div>
+        <div class="tips">账户余额: {{totalMoney}}元，扣除{{percent}}%的平台费</div>
         <div class="submit">
-          <cube-button>提现</cube-button>
+          <cube-button @click="doSubmit">{{btnTxt}}</cube-button>
         </div>
       </div>
     </template>
@@ -41,8 +46,11 @@
       return {
         isLoading: true,
         type: 1,
-        placeholder: '可提现金额¥234',
-        amount: ''
+        clickMore: true,
+        btnTxt: '提现',
+        totalMoney: '',
+        amount: '',
+        percent: '' // 提醒扣除比例
       }
     },
     created() {
@@ -50,12 +58,65 @@
     },
     methods: {
       async fetchData() {
-        let ret = await this.getData()
-        this.ret = ret
+        const [user, ret] = await Promise.all([
+          this.findUserById(),
+          this.selectByKey()
+        ])
+        this.totalMoney = user.money
+        this.percent = ret.vals
         this.isLoading = false
       },
-      getData() {
-
+      // 根据用户ID获取用户信息
+      findUserById() {
+        return new Promise(resolve => {
+          this.$post(api.findUserById).then(res => {
+            if (res.code === ERR_OK) {
+              resolve(res.data)
+            }
+          })
+        })
+      },
+      // 平台设置查询
+      selectByKey() {
+        return new Promise(resolve => {
+          this.$post(api.selectByKey).then(res => {
+            if (res.code === ERR_OK) {
+              resolve(res.data)
+            }
+          })
+        })
+      },
+      // 全部提现
+      getAllMoney() {
+        this.amount = this.totalMoney
+      },
+      // 提现
+      doSubmit() {
+        if (!this.amount) {
+          this.$toast('请输入提现金额')
+          return
+        }
+        if (this.amount > this.totalMoney) {
+          this.$toast('提现金额不能大于账户余额')
+          return
+        }
+        if (this.clickMore) {
+          this.clickMore = false
+          this.btnTxt = '提交中...'
+          this.$post(api.addWithdraw, {
+            money: this.amount
+          }).then(res => {
+            if (res.code === ERR_OK) {
+              this.totalMoney -= this.amount
+              this.amount = ''
+              this.$toast('提现成功', 'correct')
+            } else {
+              this.$toast(res.message, 'error')
+            }
+            this.btnTxt = '提现'
+            this.clickMore = true
+          })
+        }
       },
       // 选择支付方式
       payHandler(type) {
@@ -76,6 +137,16 @@
 
   .wrapper
     padding: 25px 15px 0
+    .title
+      display: flex
+      justify-content: space-between
+      align-items: center
+      margin-bottom: 12px
+      .lbl
+        color: $dark
+      .all
+        color: $color
+        extend-click()
     .amount
       height: 42px
       border: 1px solid $border
@@ -117,4 +188,8 @@
         i
           bg-image('../recharge/alipay', 23px, 23px)
 
+    .tips
+      color: $gray
+      font-size: 13px
+      margin: 10px 0 50px
 </style>
